@@ -8,7 +8,7 @@ class vkApi{
 
   private static $urlQuery = array(
     'countMember' => 'https://api.vk.com/method/groups.getMembers',
-    'title' => 'https://api.vk.com/method/groups.getSettings',
+    'title' => 'https://api.vk.com/method/groups.getById',
   );
 
   /**
@@ -17,10 +17,11 @@ class vkApi{
    * @param $requestParams Array Params to send query
    * @return $response Object Response data.
    */
-  private static function getQuery($queryUrl,$requestParams){
-    $get_params = http_build_query($request_params); 
-    $result = json_decode(file_get_contents("$queryUrl?$get_params")); 
-    return $result -> response[0]; 
+  public static function getQuery($queryUrl, $requestParams){
+    $getParams = http_build_query($requestParams); 
+
+    $result = json_decode(file_get_contents("$queryUrl?$getParams")); 
+    return $result->response; 
   }
 
   /**
@@ -29,13 +30,15 @@ class vkApi{
    * @param $accessToken String Token for send query by API
    * @return $title String Group Title
    */
-  public static function getTitle($groupId,$accessToken){
+  public static function getTitleGroup($groupId,$accessToken){
+    
     $requestParams = array(
       'group_id' => $groupId, 
+      'fields' => 'name',
       'v' => '5.52', 
       'access_token' => $accessToken,
     ); 
-    return $title = self::getQuery(self::$urlQuery['title'], $requestParams)->title;
+    return self::getQuery(self::$urlQuery['title'], $requestParams)[0]->name;
   }
 
   /**
@@ -48,11 +51,10 @@ class vkApi{
   public static function getCountMembers($groupId,$accessToken){
     $requestParams = array(
       'group_id' => $groupId, 
-      'fields' => 'bdate,status', 
       'v' => '5.52', 
       'access_token' => $accessToken,
     ); 
-    return self::getQuery(self::$urlQuery['countMember'], $requestParams);
+    return self::getQuery(self::$urlQuery['countMember'], $requestParams)->count;
   }
 
  }
